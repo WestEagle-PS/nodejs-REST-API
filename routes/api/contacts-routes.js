@@ -1,21 +1,23 @@
 const express = require('express');
 const contactsControllers = require('../../controllers/contacts-controllers');
 const { schemas } = require('../../models/contact');
-const { isValidId } = require('../../middlewares');
+const { isValidId, authenticate } = require('../../middlewares');
 const { validateBody } = require('../../utils');
 
 const router = express.Router();
 
-router.get('/', contactsControllers.getAllContacts);
+// router.use(authenticate); можем так записать, если все роуты в данном контроллере приватные
 
-router.get('/:id', isValidId, contactsControllers.getContactById);
+router.get('/', authenticate, contactsControllers.getAllContacts);
 
-router.post('/', validateBody(schemas.contactAddSchema), contactsControllers.addContact);
+router.get('/:id', authenticate, isValidId, contactsControllers.getContactById);
 
-router.put('/:id', isValidId, validateBody(schemas.contactAddSchema), contactsControllers.updateContactById);
+router.post('/', authenticate, validateBody(schemas.contactAddSchema), contactsControllers.addContact);
 
-router.patch('/:id/favorite', isValidId, validateBody(schemas.contactUpdateFavoriteSchema), contactsControllers.updateContactFavorite);
+router.put('/:id', authenticate, isValidId, validateBody(schemas.contactAddSchema), contactsControllers.updateContactById);
 
-router.delete('/:id', isValidId, contactsControllers.deleteContactById);
+router.patch('/:id/favorite', authenticate, isValidId, validateBody(schemas.contactUpdateFavoriteSchema), contactsControllers.updateContactFavorite);
+
+router.delete('/:id', authenticate, isValidId, contactsControllers.deleteContactById);
 
 module.exports = router;
